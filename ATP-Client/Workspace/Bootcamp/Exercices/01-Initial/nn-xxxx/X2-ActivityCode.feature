@@ -28,7 +28,7 @@ Feature: FEATURE Create Custom Activity Code
 
         # Field : Activity code (Screen : ACV2 / CODACT) (Data type : ACV Alphanumeric None ) (Options : ) () (!! Mandatory field !!)
         Given the user selects the text field with name: "Activity code"
-        When the user writes "param:jason" to the selected text field
+        When the user writes "ZOH" to the selected text field
         And the user hits tab
 
         # Field : Activity code (Screen : ACV2 / CODACT) (Data type : ACV Alphanumeric None ) (Options : ) () (!! Mandatory field !!)
