@@ -1,0 +1,62 @@
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#**
+#* [L]Y_IN_01 : Directory to import : File in the current X3 folder
+#* ex: [L]Y_IN_01 = "tmp"
+#* [L]Y_IN_02 : Name File to import
+#* ex: [L]Y_IN_02 = "YATP_30.2-X3-SOEntry"
+#* [L]Y_IN_02 : Extension File to import
+#* ex: [L]Y_IN_03 = "csv"
+#* Creation of this texts if they don't exist
+#*!
+$EXEC
+
+Local Char YFILE(250)
+Local Integer YFSTAT
+Local Char YCHP(100)(1..)
+Local Char YVARS(100)(1..)
+Local Integer YNBL,YI, YNB_YVARS
+
+YFILE = filpath([L]Y_IN_01,[L]Y_IN_02,[L]Y_IN_03,nomap)
+
+Openi YFILE Using [YIN]
+Iomode adxifs ";" Using [YIN]
+Iomode adxirs chr$(10) Using [YIN]
+Iomode adxium GUTF8 Using [YIN]
+
+YFSTAT = 0
+YNBL=0
+Call OUVRE_TRACE("Results") From LECFIC
+While YFSTAT=0
+
+ If YNBL=1
+  For YI = 1 To maxtab(YCHP)
+   If YCHP(YI)=""
+    Break
+   Else
+     YCHP(YI) = ctrans(YCHP(YI))
+     YCHP(YI) = vireblc(YCHP(YI),2)
+   Endif
+
+   [L]YNB_YVARS+=1
+   [L]YVARS([L]YNB_YVARS) = YCHP(YI)
+  Next
+ Elsif YNBL>1
+  For YI=1 To [L]YNB_YVARS
+   Call ECR_TRACE(format$("K:30X",[L]YVARS(YI)+"_"+num$(YNBL-1))+"="+YCHP(YI),0) From GESECRAN
+  Next
+ Endif
+ Rdseq YCHP Using [YIN]
+ YFSTAT = fstat
+ If YFSTAT=0
+  YNBL+=1
+ Endif
+Wend
+Openi Using [YIN]
+
+
+#Call ECR_TRACE("OUT_01="+Y_OUT_01,0) From GESECRAN
+#Call ECR_TRACE("OUT_02="+Y_OUT_02,0) From GESECRAN
+
+Call FERME_TRACE From LECFIC
+Call LEC_TRACE From LECFIC
+Return

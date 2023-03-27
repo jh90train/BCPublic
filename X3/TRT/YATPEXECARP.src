@@ -1,0 +1,76 @@
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#TRT: YTRT_ARP_TRT_TST
+$ACTION
+Case ACTION
+Endcase
+Return
+
+#########################################################################
+
+Subprog IMPRIME(NBPAR,PARAMETRE)
+Value    Integer NBPAR
+Variable Char    PARAMETRE()()
+
+Call EXEC(NBPAR,PARAMETRE)
+
+End
+
+######################################################################
+
+Subprog EXEC(NBPAR,PARAMETRE)
+Value Integer    NBPAR
+Variable Char    PARAMETRE()()
+# -- ARCCLIENT2
+Local Date    DATREF
+
+
+#--- ouverture des tables
+Gosub OUVRE
+#--- declaration des variables
+Gosub DECLARE
+
+#--- analyse des param?es
+For I=1 To NBPAR
+ J=instr(1,[L]PARAMETRE(I),"=")
+ If J
+  [L]PARAM  = left$([L]PARAMETRE(I),J-1)
+  Call GETPARAM ([L]PARAM,NBPAR,PARAMETRE,VALEUR) From ETAT
+#  [L]VALEUR = right$([L]PARAMETRE(I),J+1)
+  Case [L]PARAM
+   When "trt"             : [L]YTRT    = VALEUR
+   When "in_01"           : [L]Y_IN_01 = VALEUR
+   When "in_02"           : [L]Y_IN_02 = VALEUR
+   When "in_03"           : [L]Y_IN_03 = VALEUR
+   When "in_04"           : [L]Y_IN_04 = VALEUR
+   When "in_05"           : [L]Y_IN_05 = VALEUR
+  Endcase
+ Endif
+Next
+
+
+Gosub  EXEC From = [L]YTRT
+
+
+
+# Not execution of report
+GOK=0
+
+End
+
+
+###########################################################################
+
+$OUVRE
+
+Return
+
+$DECLARE
+
+Local Char    PARAM(30) , VALEUR(30) , ETAT(15)
+Local Integer I,J
+
+Local Char YTRT(50)
+Local Char Y_IN_01(200),Y_IN_02(200),Y_IN_03(200),Y_IN_04(200),Y_IN_05(200)
+
+Return
+#

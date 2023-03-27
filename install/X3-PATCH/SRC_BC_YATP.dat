@@ -1,0 +1,466 @@
+1,"","ENG/FRA","1","YATP","X3","1",
+2,"TRT","YATPEXECARP",""
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#TRT: YTRT_ARP_TRT_TST
+$ACTION
+Case ACTION
+Endcase
+Return
+
+#########################################################################
+
+Subprog IMPRIME(NBPAR,PARAMETRE)
+Value    Integer NBPAR
+Variable Char    PARAMETRE()()
+
+Call EXEC(NBPAR,PARAMETRE)
+
+End
+
+######################################################################
+
+Subprog EXEC(NBPAR,PARAMETRE)
+Value Integer    NBPAR
+Variable Char    PARAMETRE()()
+# -- ARCCLIENT2
+Local Date    DATREF
+
+
+#--- ouverture des tables
+Gosub OUVRE
+#--- declaration des variables
+Gosub DECLARE
+
+#--- analyse des param?es
+For I=1 To NBPAR
+ J=instr(1,[L]PARAMETRE(I),"=")
+ If J
+  [L]PARAM  = left$([L]PARAMETRE(I),J-1)
+  Call GETPARAM ([L]PARAM,NBPAR,PARAMETRE,VALEUR) From ETAT
+#  [L]VALEUR = right$([L]PARAMETRE(I),J+1)
+  Case [L]PARAM
+   When "trt"             : [L]YTRT    = VALEUR
+   When "in_01"           : [L]Y_IN_01 = VALEUR
+   When "in_02"           : [L]Y_IN_02 = VALEUR
+   When "in_03"           : [L]Y_IN_03 = VALEUR
+   When "in_04"           : [L]Y_IN_04 = VALEUR
+   When "in_05"           : [L]Y_IN_05 = VALEUR
+  Endcase
+ Endif
+Next
+
+
+Gosub  EXEC From = [L]YTRT
+
+
+
+# Not execution of report
+GOK=0
+
+End
+
+
+###########################################################################
+
+$OUVRE
+
+Return
+
+$DECLARE
+
+Local Char    PARAM(30) , VALEUR(30) , ETAT(15)
+Local Integer I,J
+
+Local Char YTRT(50)
+Local Char Y_IN_01(200),Y_IN_02(200),Y_IN_03(200),Y_IN_04(200),Y_IN_05(200)
+
+Return
+#
+**********
+7,"TRT","YATPEXECARP",""
+2,"TRT","YCREATE_TEXT",""
+#<AdxTL>@(#)0.0.0.0 $Revision$
+
+#**
+#* [L]Y_IN_0N : Texts for the dictionnary function : screens, tables, windows,...
+#* Creation of this texts if they don't exist
+#*!
+$EXEC
+
+Local Integer YNUM
+If [L]Y_IN_01<>""
+ Call NUMERO([L]Y_IN_01,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_02<>""
+ Call NUMERO([L]Y_IN_02,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_03<>""
+ Call NUMERO([L]Y_IN_03,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_04<>""
+ Call NUMERO([L]Y_IN_04,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_05<>""
+ Call NUMERO([L]Y_IN_05,[L]YNUM) From OBJDIV
+Endif
+
+Return
+**********
+7,"TRT","YCREATE_TEXT",""
+2,"TRT","YGET_CSV_FILE",""
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#**
+#* [L]Y_IN_01 : Directory to import : File in the current X3 folder
+#* ex: [L]Y_IN_01 = "tmp"
+#* [L]Y_IN_02 : Name File to import
+#* ex: [L]Y_IN_02 = "YATP_30.2-X3-SOEntry"
+#* [L]Y_IN_02 : Extension File to import
+#* ex: [L]Y_IN_03 = "csv"
+#* Creation of this texts if they don't exist
+#*!
+$EXEC
+
+Local Char YFILE(250)
+Local Integer YFSTAT
+Local Char YCHP(100)(1..)
+Local Char YVARS(100)(1..)
+Local Integer YNBL,YI, YNB_YVARS
+
+YFILE = filpath([L]Y_IN_01,[L]Y_IN_02,[L]Y_IN_03,nomap)
+
+Openi YFILE Using [YIN]
+Iomode adxifs ";" Using [YIN]
+Iomode adxirs chr$(10) Using [YIN]
+Iomode adxium GUTF8 Using [YIN]
+
+YFSTAT = 0
+YNBL=0
+Call OUVRE_TRACE("Results") From LECFIC
+While YFSTAT=0
+
+ If YNBL=1
+  For YI = 1 To maxtab(YCHP)
+   If YCHP(YI)=""
+    Break
+   Else
+     YCHP(YI) = ctrans(YCHP(YI))
+     YCHP(YI) = vireblc(YCHP(YI),2)
+   Endif
+
+   [L]YNB_YVARS+=1
+   [L]YVARS([L]YNB_YVARS) = YCHP(YI)
+  Next
+ Elsif YNBL>1
+  For YI=1 To [L]YNB_YVARS
+   Call ECR_TRACE(format$("K:30X",[L]YVARS(YI)+"_"+num$(YNBL-1))+"="+YCHP(YI),0) From GESECRAN
+  Next
+ Endif
+ Rdseq YCHP Using [YIN]
+ YFSTAT = fstat
+ If YFSTAT=0
+  YNBL+=1
+ Endif
+Wend
+Openi Using [YIN]
+
+
+#Call ECR_TRACE("OUT_01="+Y_OUT_01,0) From GESECRAN
+#Call ECR_TRACE("OUT_02="+Y_OUT_02,0) From GESECRAN
+
+Call FERME_TRACE From LECFIC
+Call LEC_TRACE From LECFIC
+Return
+**********
+7,"TRT","YGET_CSV_FILE",""
+2,"TRT","YTRT_ARP_TRT_TST",""
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#**
+#* Local variables Y_IN_0M to use.
+#* String variables CHAR(200)
+#* [L]Y_IN_01, ... [L]Y_IN_05
+#*
+#* [L]Y_IN_01 = "Olivier"
+#* [L]Y_IN_02 = "Mantel"
+#*!
+$EXEC
+
+
+Local Char Y_OUT_01(200),Y_OUT_02(200)
+
+[L]Y_OUT_01 = "My first name is "+[L]Y_IN_01
+[L]Y_OUT_02 = "My last name is " +[L]Y_IN_02
+
+Call OUVRE_TRACE("Results") From LECFIC
+
+Call ECR_TRACE(format$("K:30X","OUT_01")+"="+[L]Y_OUT_01,0) From GESECRAN
+Call ECR_TRACE(format$("K:30X","OUT_02")+"="+[L]Y_OUT_02,0) From GESECRAN
+
+Call FERME_TRACE From LECFIC
+Call LEC_TRACE From LECFIC
+
+Return
+**********
+7,"TRT","YTRT_ARP_TRT_TST",""
+2,"ACV","YATP","ATP"
+3,"ACV",YATP
+4,"ACTDEP",0,""
+4,"ACTFOR",0,""
+4,"CODACT",0,"YATP"
+4,"CREDAT",0,20230210
+4,"CREDATTIM",0,"2023-02-10T12:57:28Z"
+4,"CREUSR",0,"ADMIN"
+4,"DEP",0,1
+4,"DIME",0,0
+4,"DIMFIL",0,0
+4,"DIMMAX",0,0
+4,"FLACT",0,2
+4,"INTIT",0,""
+5,"LIBACT",0,"ATP","ENG",100156,""
+5,"LIBACT",0,"ATP","FRA",100156,""
+5,"LIBACT",0,"","***"
+4,"MODULE",0,1
+4,"ORDRE",0,0
+4,"RANG",0,0
+4,"TYP",0,1
+4,"UPDDAT",0,20230210
+4,"UPDDATTIM",0,"2023-02-10T12:57:28Z"
+4,"UPDFLG",0,0
+4,"UPDUSR",0,"ADMIN"
+6,"ACV"
+7,"ACV","YATP","ATP"
+2,"ARP","YATP","Etat ATP"
+3,"ARP",YATP
+4,"ACS",0,""
+4,"AUZFCY",0,1
+4,"CODACT",0,"YATP"
+4,"CODZPL",0,""
+4,"CREDAT",0,20230210
+4,"CREDATTIM",0,"2023-02-10T13:02:41Z"
+4,"CREUSR",0,"ADMIN"
+4,"CRYCOD",0,"tabcountry"
+4,"CRYCOD",1,""
+4,"CRYCOD",2,""
+4,"CRYCOD",3,""
+4,"CRYCOD",4,""
+4,"DEVAPP",0,""
+4,"DEVAPP",1,""
+4,"DEVAPP",2,""
+4,"DEVAPP",3,""
+4,"DEVAPP",4,""
+4,"DEVDAT",0,000000
+4,"DEVDAT",1,000000
+4,"DEVDAT",2,000000
+4,"DEVDAT",3,000000
+4,"DEVDAT",4,000000
+4,"DEVLAN",0,""
+4,"DEVLAN",1,""
+4,"DEVLAN",2,""
+4,"DEVLAN",3,""
+4,"DEVLAN",4,""
+4,"DEVSRV",0,""
+4,"DEVSRV",1,""
+4,"DEVSRV",2,""
+4,"DEVSRV",3,""
+4,"DEVSRV",4,""
+4,"DEVSTA",0,1
+4,"DEVSTA",1,0
+4,"DEVSTA",2,0
+4,"DEVSTA",3,0
+4,"DEVSTA",4,0
+4,"DEVUSR",0,""
+4,"DEVUSR",1,""
+4,"DEVUSR",2,""
+4,"DEVUSR",3,""
+4,"DEVUSR",4,""
+4,"ENAFLG",0,2
+4,"EXEBAT",0,1
+4,"EXEFLG",0,1
+4,"EXPNUM",0,46
+4,"FNC",0,""
+4,"FORETA",0,1
+4,"FORETA",1,0
+4,"FORETA",2,0
+4,"FORETA",3,0
+4,"FORETA",4,0
+4,"GESZPL",0,1
+4,"GRP",0,1
+4,"HOR",0,""
+4,"IMPLIE",0,1
+4,"LAN",0,"ENG"
+4,"MODULE",0,1
+4,"MULLAN",0,1
+4,"ORIENT",0,1
+4,"ORIENT",1,0
+4,"ORIENT",2,0
+4,"ORIENT",3,0
+4,"ORIENT",4,0
+4,"PARSEG",0,""
+4,"PRTDEF",0,""
+4,"PRTDES",0,""
+4,"PRTDES",1,""
+4,"PRTDRV",0,""
+4,"PRTFRM",0,""
+4,"PRTNAM",0,""
+4,"PRTNAT",0,1
+4,"PRTOBL",0,1
+4,"PRTPOR",0,""
+4,"PRTSRV",0,""
+4,"RPTCOD",0,"YATP"
+5,"RPTDES",0,"Etat ATP","ENG",100157,""
+5,"RPTDES",0,"Etat ATP","FRA",100157,""
+5,"RPTDES",0,"","***"
+5,"RPTSHO",0,"ATP","ENG",100156,""
+5,"RPTSHO",0,"ATP","FRA",100156,""
+5,"RPTSHO",0,"","***"
+4,"TRTINI",0,"YATPEXECARP"
+4,"TRTSPE",0,""
+4,"UPDDAT",0,20230323
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARP"
+3,"ARD",TRT
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"TRT"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Script","ENG",17264,""
+5,"PARNAM",0,"Script","FRA",17264,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,1
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+3,"ARD",IN_01
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"IN_01"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Input param 1","ENG",100158,""
+5,"PARNAM",0,"Input param 1","FRA",100158,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,2
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+3,"ARD",IN_02
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"IN_02"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Input param 2","ENG",100159,""
+5,"PARNAM",0,"Input param 2","FRA",100159,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,3
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+3,"ARD",IN_03
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"IN_03"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Input param 3","ENG",100164,""
+5,"PARNAM",0,"Input param 3","FRA",100164,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,4
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+3,"ARD",IN_04
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"IN_04"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Input param 4","ENG",100165,""
+5,"PARNAM",0,"Input param 4","FRA",100165,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,5
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+3,"ARD",in_05
+4,"CREDATTIM",0,"2023-03-23T17:34:40Z"
+4,"CREUSR",0,"ADMIN"
+4,"PARACS",0,""
+4,"PARCOD",0,"in_05"
+4,"PARCTL",0,""
+4,"PARCTLTAB",0,""
+4,"PARDEF1",0,""
+4,"PARDEF2",0,""
+4,"PARLNG",0,50
+5,"PARNAM",0,"Input param 5","ENG",100166,""
+5,"PARNAM",0,"Input param 5","FRA",100166,""
+5,"PARNAM",0,"","***"
+4,"PARNOLIB",0,0
+4,"PARNUM",0,6
+4,"PAROPT",0,""
+4,"PARPAR",0,""
+4,"PARSAI",0,2
+4,"PARSTREND",0,1
+4,"PARTYP",0,"A"
+4,"RPTCOD",0,"YATP"
+4,"UPDDATTIM",0,"2023-03-23T17:34:40Z"
+4,"UPDUSR",0,"ADMIN"
+6,"ARD"
+7,"ARP","YATP","Etat ATP"
+8,""

@@ -1,0 +1,26 @@
+#<AdxTL>@(#)0.0.0.0 $Revision$
+#**
+#* Local variables Y_IN_0M to use.
+#* String variables CHAR(200)
+#* [L]Y_IN_01, ... [L]Y_IN_05
+#*
+#* [L]Y_IN_01 = "Olivier"
+#* [L]Y_IN_02 = "Mantel"
+#*!
+$EXEC
+
+
+Local Char Y_OUT_01(200),Y_OUT_02(200)
+
+[L]Y_OUT_01 = "My first name is "+[L]Y_IN_01
+[L]Y_OUT_02 = "My last name is " +[L]Y_IN_02
+
+Call OUVRE_TRACE("Results") From LECFIC
+
+Call ECR_TRACE(format$("K:30X","OUT_01")+"="+[L]Y_OUT_01,0) From GESECRAN
+Call ECR_TRACE(format$("K:30X","OUT_02")+"="+[L]Y_OUT_02,0) From GESECRAN
+
+Call FERME_TRACE From LECFIC
+Call LEC_TRACE From LECFIC
+
+Return

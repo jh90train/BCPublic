@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "ATP-Client/Workspace/github-workspace-public"
+    },
+    {
+      "path": "ATP-Client"
+    },
+    {
+      "path": "coex-extension-vscode-atp"
+    },
+    {
+      "path": "install"
+    }
+  ],
+  "settings": {}
+}

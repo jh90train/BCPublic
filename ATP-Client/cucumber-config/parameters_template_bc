@@ -1,0 +1,15 @@
+loginUserName=user
+loginPassword=userpassword
+loginUserRootName=user
+loginUserRootPassword=userpassword
+loginType=basic
+endPointRoot=X3ERPV12 / X3
+endPointName1=X3ERPV12 / SEED
+endPointName2=X3ERPV12 / SEED
+x3SolutionName=X3ERPV12
+timeout=120000
+baseUrl=http://localhost:8124/
+report_folder=\report\
+portNumber=5000
+downloadFolder=D:\Sage\SafeX3\Atp\DOWNLOAD
+userStoredValuesFile=cucumber-user-config/user/user-stored-values

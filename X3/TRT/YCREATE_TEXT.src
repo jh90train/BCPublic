@@ -1,0 +1,26 @@
+#<AdxTL>@(#)0.0.0.0 $Revision$
+
+#**
+#* [L]Y_IN_0N : Texts for the dictionnary function : screens, tables, windows,...
+#* Creation of this texts if they don't exist
+#*!
+$EXEC
+
+Local Integer YNUM
+If [L]Y_IN_01<>""
+ Call NUMERO([L]Y_IN_01,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_02<>""
+ Call NUMERO([L]Y_IN_02,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_03<>""
+ Call NUMERO([L]Y_IN_03,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_04<>""
+ Call NUMERO([L]Y_IN_04,[L]YNUM) From OBJDIV
+Endif
+If [L]Y_IN_05<>""
+ Call NUMERO([L]Y_IN_05,[L]YNUM) From OBJDIV
+Endif
+
+Return
